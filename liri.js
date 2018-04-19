@@ -13,8 +13,18 @@ const log4js = require('log4js');
 
 // Configure Logger for log file
 log4js.configure({
-  appenders: { Liri: { type: 'file', filename: 'app.log' }},
-  categories: { default: { appenders: ['Liri'], level: 'info' } }
+  appenders: {
+    Liri: {
+      type: 'file',
+      filename: 'app.log'
+    }
+  },
+  categories: {
+    default: {
+      appenders: ['Liri'],
+      level: 'info'
+    }
+  }
 });
 
 // Setting up the logger
@@ -80,36 +90,36 @@ inquirer.prompt([initialOption]).then(answers => {
       searchTweets();
       break;
 
-    /**
-     * When user wants to search for song
-     */
+      /**
+       * When user wants to search for song
+       */
     case 'spotify-this-song':
       inquirer.prompt([songSearchOption]).then(answers => {
         answers.song === '' ? searchSpotify("The Sign - Ace of Base") : searchSpotify(answers.song);
       });
       break;
 
-    /**
-     * When user wants to search for a movie
-     */
+      /**
+       * When user wants to search for a movie
+       */
     case 'movie-this':
       inquirer.prompt([movieSearchOption]).then(answers => {
         answers.movie === '' ? searchForMovie("Mr. Nobody.") : searchForMovie(answers.movie);
       });
       break;
 
-    /**
-    * Reads a random text file and search for a song in spotify 
-    */
+      /**
+       * Reads a random text file and search for a song in spotify 
+       */
     case 'do-what-it-says':
       fs.readFile('random.txt', 'utf8', (err, data) => {
         searchSpotify(data.split(",")[1]);
       });
       break;
 
-    /**
-     * Default
-     */
+      /**
+       * Default
+       */
     default:
       logger.info("No right option");
   }
@@ -120,29 +130,34 @@ inquirer.prompt([initialOption]).then(answers => {
  */
 const searchTweets = function () {
   client.get('favorites/list', function (error, tweets, response) {
+
     if (error) throw colors.red(JSON.stringify(error));
-    
-    logger.info("**************************************************************************");
-    console.log(colors.cyan("**************************************************************************"));
-    
-    tweets.forEach(tweet => {
 
-      // Logging to the log file
-      logger.info("---------------------------------------------");
-      logger.info(tweet.text);
-      logger.info(tweet.user.description);
-      logger.info("---------------------------------------------");
-      
-      // Console log
-      console.log(colors.blue("-----------"));
-      console.info(colors.magenta(tweet.text));
-      console.info(colors.green(tweet.user.description));
-      console.info(colors.blue("-----------"));
-    });
+    if (tweets.length > 0) {
+      logger.info("**************************************************************************");
+      console.log(colors.cyan("**************************************************************************"));
+      tweets.forEach(tweet => {
 
-    logger.info("**************************************************************************");
-    console.log(colors.cyan("**************************************************************************"));
-  
+        // Logging to the log file
+        logger.info("---------------------------------------------");
+        logger.info(tweet.text);
+        logger.info(tweet.user.description);
+        logger.info("---------------------------------------------");
+
+        // Console log
+        console.log(colors.blue("-----------"));
+        console.info(colors.magenta(tweet.text));
+        console.info(colors.green(tweet.user.description));
+        console.info(colors.blue("-----------"));
+      });
+
+      logger.info("**************************************************************************");
+      console.log(colors.cyan("**************************************************************************"));
+
+    } else {
+      console.log("No results found");
+    }
+
   });
 };
 
@@ -157,14 +172,14 @@ const searchSpotify = function (song) {
       query: song
     })
     .then(response => {
-      
+
       logger.info("**************************************************************************");
       logger.info("Song Name: ", response.tracks.items[0].name);
       logger.info("Album Name: ", response.tracks.items[0].album.name);
       logger.info("Artist Name: ", response.tracks.items[0].album.artists[0].name);
       logger.info("Spotify Link: ", response.tracks.items[0].external_urls.spotify);
       logger.info("**************************************************************************");
-      
+
       console.log(colors.cyan("**************************************************************************"));
       console.log(colors.magenta("Song Name: "), colors.green(response.tracks.items[0].name));
       console.log(colors.magenta("Album Name: "), colors.green(response.tracks.items[0].album.name));
@@ -187,29 +202,35 @@ const searchForMovie = function (movie) {
   let key = "trilogy";
   let requestURL = `${url}?apikey=${key}&t=${movie}`;
   request(requestURL, function (error, response, body) {
-    
-    // Logging into the file
-    logger.info(("**************************************************************************"));
-    logger.info("Title: ", JSON.parse(body)["Title"]);
-    logger.info("Year: ", JSON.parse(body)["Year"]);
-    logger.info("IMDB Rating: ", JSON.parse(body)["imdbRating"]);
-    logger.info("Rotten Tomatoes Rating: ", JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A");
-    logger.info("Country: ", JSON.parse(body)["Country"]);
-    logger.info("Language: ", JSON.parse(body)["Language"]);
-    logger.info("Plot: ", JSON.parse(body)["Plot"]);
-    logger.info("Actors: ", JSON.parse(body)["Actors"]);
-    logger.info("**************************************************************************");
 
-    // Logging on the console
-    console.log(colors.cyan("**************************************************************************"));
-    console.log(colors.magenta("Title: "), colors.green(JSON.parse(body)["Title"]));
-    console.log(colors.magenta("Year: "), colors.green(JSON.parse(body)["Year"]));
-    console.log(colors.magenta("IMDB Rating: "), colors.green(JSON.parse(body)["imdbRating"]));
-    console.log(colors.magenta("Rotten Tomatoes Rating: "), colors.green(JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A"));
-    console.log(colors.magenta("Country: "), colors.green(JSON.parse(body)["Country"]));
-    console.log(colors.magenta("Language: "), colors.green(JSON.parse(body)["Language"]));
-    console.log(colors.magenta("Plot: "), colors.green(JSON.parse(body)["Plot"]));
-    console.log(colors.magenta("Actors: "), colors.green(JSON.parse(body)["Actors"]));
-    console.log(colors.cyan("**************************************************************************"));
+    if (body) {
+      // Logging into the file
+      logger.info(("**************************************************************************"));
+      logger.info("Title: ", JSON.parse(body)["Title"]);
+      logger.info("Year: ", JSON.parse(body)["Year"]);
+      logger.info("IMDB Rating: ", JSON.parse(body)["imdbRating"]);
+      logger.info("Rotten Tomatoes Rating: ", JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A");
+      logger.info("Country: ", JSON.parse(body)["Country"]);
+      logger.info("Language: ", JSON.parse(body)["Language"]);
+      logger.info("Plot: ", JSON.parse(body)["Plot"]);
+      logger.info("Actors: ", JSON.parse(body)["Actors"]);
+      logger.info("**************************************************************************");
+
+      // Logging on the console
+      console.log(colors.cyan("**************************************************************************"));
+      console.log(colors.magenta("Title: "), colors.green(JSON.parse(body)["Title"]));
+      console.log(colors.magenta("Year: "), colors.green(JSON.parse(body)["Year"]));
+      console.log(colors.magenta("IMDB Rating: "), colors.green(JSON.parse(body)["imdbRating"]));
+      console.log(colors.magenta("Rotten Tomatoes Rating: "), colors.green(JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A"));
+      console.log(colors.magenta("Country: "), colors.green(JSON.parse(body)["Country"]));
+      console.log(colors.magenta("Language: "), colors.green(JSON.parse(body)["Language"]));
+      console.log(colors.magenta("Plot: "), colors.green(JSON.parse(body)["Plot"]));
+      console.log(colors.magenta("Actors: "), colors.green(JSON.parse(body)["Actors"]));
+      console.log(colors.cyan("**************************************************************************"));
+
+    } else {
+      console.log("No results found");
+    }
+
   });
 };

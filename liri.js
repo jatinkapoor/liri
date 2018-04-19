@@ -202,14 +202,14 @@ const searchForMovie = function (movie) {
   let key = "trilogy";
   let requestURL = `${url}?apikey=${key}&t=${movie}`;
   request(requestURL, function (error, response, body) {
-
-    if (body) {
+    
+    if (! JSON.parse(body)['Error']) {
       // Logging into the file
       logger.info(("**************************************************************************"));
-      logger.info("Title: ", JSON.parse(body)["Title"]);
+      logger.info("Title: ", JSON.parse(body)["Nola"]);
       logger.info("Year: ", JSON.parse(body)["Year"]);
       logger.info("IMDB Rating: ", JSON.parse(body)["imdbRating"]);
-      logger.info("Rotten Tomatoes Rating: ", JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A");
+      logger.info("Rotten Tomatoes Rating: ", JSON.parse(body)["Ratings"] && JSON.parse(body)["Ratings"][1] ? JSON.parse(body)["Ratings"][1].Value : "N/A");
       logger.info("Country: ", JSON.parse(body)["Country"]);
       logger.info("Language: ", JSON.parse(body)["Language"]);
       logger.info("Plot: ", JSON.parse(body)["Plot"]);
@@ -221,7 +221,7 @@ const searchForMovie = function (movie) {
       console.log(colors.magenta("Title: "), colors.green(JSON.parse(body)["Title"]));
       console.log(colors.magenta("Year: "), colors.green(JSON.parse(body)["Year"]));
       console.log(colors.magenta("IMDB Rating: "), colors.green(JSON.parse(body)["imdbRating"]));
-      console.log(colors.magenta("Rotten Tomatoes Rating: "), colors.green(JSON.parse(body)["Ratings"][1].Value ? JSON.parse(body)["Ratings"][1].Value : "N/A"));
+      console.log(colors.magenta("Rotten Tomatoes Rating: "), colors.green(JSON.parse(body)["Ratings"] && JSON.parse(body)["Ratings"][1] ? JSON.parse(body)["Ratings"][1].Value : "N/A"));
       console.log(colors.magenta("Country: "), colors.green(JSON.parse(body)["Country"]));
       console.log(colors.magenta("Language: "), colors.green(JSON.parse(body)["Language"]));
       console.log(colors.magenta("Plot: "), colors.green(JSON.parse(body)["Plot"]));

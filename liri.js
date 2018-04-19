@@ -9,13 +9,15 @@ const inquirer = require('inquirer');
 const request = require('request');
 const colors = require('colors');
 const fs = require('fs');
-
 const log4js = require('log4js');
 
+// Configure Logger for log file
 log4js.configure({
   appenders: { Liri: { type: 'file', filename: 'app.log' }},
-  categories: { default: { appenders: ['Liri'], level: 'info' } }});
+  categories: { default: { appenders: ['Liri'], level: 'info' } }
+});
 
+// Setting up the logger
 const logger = log4js.getLogger('Liri');
 
 /**
@@ -126,10 +128,10 @@ const searchTweets = function () {
     tweets.forEach(tweet => {
 
       // Logging to the log file
-      logger.info("-----------");
+      logger.info("---------------------------------------------");
       logger.info(tweet.text);
       logger.info(tweet.user.description);
-      logger.info("-----------");
+      logger.info("---------------------------------------------");
       
       // Console log
       console.log(colors.blue("-----------"));
@@ -171,7 +173,8 @@ const searchSpotify = function (song) {
       console.log(colors.cyan("**************************************************************************"));
     })
     .catch(err => {
-      logger.info(colors.red(err));
+      logger.info(err);
+      console.log(colors.red(err));
     });
 };
 

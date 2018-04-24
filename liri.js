@@ -173,6 +173,10 @@ const searchSpotify = function (song) {
     })
     .then(response => {
 
+      if (response.tracks.items.length === 0) {
+        return console.log("No results found");
+      }
+      
       logger.info("**************************************************************************");
       logger.info("Song Name: ", response.tracks.items[0].name);
       logger.info("Album Name: ", response.tracks.items[0].album.name);
@@ -202,10 +206,10 @@ const searchForMovie = function (movie) {
   let key = "trilogy";
   let requestURL = `${url}?apikey=${key}&t=${movie}`;
   request(requestURL, function (error, response, body) {
-    
+      
     if (! JSON.parse(body)['Error']) {
       // Logging into the file
-      logger.info(("**************************************************************************"));
+      logger.info("**************************************************************************");
       logger.info("Title: ", JSON.parse(body)["Nola"]);
       logger.info("Year: ", JSON.parse(body)["Year"]);
       logger.info("IMDB Rating: ", JSON.parse(body)["imdbRating"]);
